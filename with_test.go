@@ -1,13 +1,13 @@
-package closers_test
+package multicloser_test
 
 import (
 	"errors"
 
-	. "github.com/petergtz/bitsgo/closers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/petergtz/pegomock"
+
+	"github.com/petergtz/closers"
 )
 
 var _ = Describe("With", func() {
@@ -18,16 +18,14 @@ var _ = Describe("With", func() {
 	})
 
 	It("no error", func() {
-		e := With(closer, func() error { return nil }, Identity)
+		e := multicloser.New(closer).CloseAfter(func() error { return nil }, nil)
 
 		closer.VerifyWasCalledOnce().Close()
 		Expect(e).NotTo(HaveOccurred())
 	})
 
 	It("error during run", func() {
-		e := With(closer, func() error {
-			return errors.New("during run")
-		}, Identity)
+		e := multicloser.New(closer).CloseAfter(func() error { return errors.New("during run") }, nil)
 
 		closer.VerifyWasCalledOnce().Close()
 		Expect(e.Error()).To(Equal("during run"))
@@ -36,9 +34,7 @@ var _ = Describe("With", func() {
 	It("error during close", func() {
 		When(closer.Close()).ThenReturn(errors.New("during close"))
 
-		e := With(closer, func() error {
-			return nil
-		}, Identity)
+		e := multicloser.New(closer).CloseAfter(func() error { return nil }, nil)
 
 		closer.VerifyWasCalledOnce().Close()
 		Expect(e.Error()).To(Equal("during close"))
@@ -47,9 +43,7 @@ var _ = Describe("With", func() {
 	It("error during run and close", func() {
 		When(closer.Close()).ThenReturn(errors.New("during close"))
 
-		e := With(closer, func() error {
-			return errors.New("during run")
-		}, Identity)
+		e := multicloser.New(closer).CloseAfter(func() error { return errors.New("during run") }, nil)
 
 		closer.VerifyWasCalledOnce().Close()
 		Expect(e.Error()).To(Equal("during run"))
@@ -58,9 +52,7 @@ var _ = Describe("With", func() {
 	It("converts a close error correctly", func() {
 		When(closer.Close()).ThenReturn(errors.New("during close"))
 
-		e := With(closer, func() error {
-			return nil
-		}, func(e error) error {
+		e := multicloser.New(closer).CloseAfter(func() error { return nil }, func(e error) error {
 			return errors.New("The converted error: " + e.Error())
 		})
 

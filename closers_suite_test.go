@@ -1,4 +1,4 @@
-package closers_test
+package multicloser_test
 
 import (
 	. "github.com/onsi/ginkgo"
