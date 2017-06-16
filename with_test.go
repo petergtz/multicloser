@@ -5,9 +5,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/petergtz/multicloser"
 	. "github.com/petergtz/pegomock"
-
-	"github.com/petergtz/closers"
 )
 
 var _ = Describe("With", func() {

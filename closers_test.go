@@ -7,9 +7,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/petergtz/multicloser"
 	. "github.com/petergtz/pegomock"
-
-	"github.com/petergtz/closers"
 )
 
 func Example_CopyFile(dstName, srcName string) (int64, error) {
